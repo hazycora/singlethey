@@ -60,7 +60,7 @@ stream.on('data', function(event) {
             verified: event.user.verified
         }
     }
-    console.log(`${tweetObj.author.display_name} (@${tweetObj.author.username})${tweetObj.author.verified?' [V]':''}: ${tweetObj}`)
+    console.log(`${tweetObj.author.display_name} (@${tweetObj.author.username})${tweetObj.author.verified?' [V]':''}: ${tweetObj.text}`)
 })
 
 stream.on('error', function(error) {

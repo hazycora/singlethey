@@ -7,7 +7,7 @@ const client = new Twitter({
     access_token_secret: process.env.ACCESS_TOKEN_SECRET
 })
 let stream = client.stream('statuses/filter', {track: 'his/her,him/her,she/he,he/she'})
-let minDelay = (60*1000)
+let minDelay = (60*1000)*20
 let lastTweet = Date.now()-minDelay
 
 function randomPassiveAggression() {
@@ -77,7 +77,7 @@ function isSensitive(event, text) {
     return false
 }
 
-stream.on('data', function(event) {
+stream.on('data', async (event) => {
     if (Date.now()-lastTweet<minDelay) return
     if (event.retweeted_status) return
     let bio = event.user.description
@@ -111,7 +111,9 @@ stream.on('data', function(event) {
         }
     }
     console.log(`${randomConsoleColor()}${tweetObj.author.display_name} (@${tweetObj.author.username})${tweetObj.author.verified?' [V]':''}:\x1b[0m ${tweetObj.text}`)
-    console.log(`\x1b[47m\x1b[30mREPLY\x1b[0m❭ @${tweetObj.author.username} ${pronounType}* ${randomPassiveAggression()}`)
+    let reply = `@${tweetObj.author.username} ${pronounType}* ${randomPassiveAggression()}`
+    console.log(`\x1b[47m\x1b[30mREPLY\x1b[0m❭ ${reply}`)
+    await client.post('statuses/update', {status: reply, in_reply_to_status_id: tweetObj.id})
 })
 
 stream.on('error', function(error) {

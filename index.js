@@ -1,5 +1,5 @@
 require('dotenv').config()
-const Twitter = require('twitter')
+const Twitter = require('twitter-lite')
 const client = new Twitter({
     consumer_key: process.env.API_KEY,
     consumer_secret: process.env.API_KEY_SECRET,
@@ -115,6 +115,8 @@ stream.on('data', async (event) => {
     console.log(`\x1b[47m\x1b[30mREPLY\x1b[0m❭ ${reply}`)
     await client.post('statuses/update', {status: reply, in_reply_to_status_id: tweetObj.id})
 })
+
+let lastCatched = Date.now()
 
 stream.on('error', function(error) {
     throw error

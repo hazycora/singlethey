@@ -10,94 +10,51 @@ let stream = client.stream('statuses/filter', {track: 'his/her,him/her,she/he,he
 let minDelay = (60*1000)*20
 let lastTweet = Date.now()-minDelay
 
-function randomPassiveAggression() {
-    let examples = [
-        ":)",
-        "🙃",
-        ":]"
-    ]
-    return examples[Math.floor(Math.random()*examples.length)]
-}
+let randInt = (from, to) => Math.floor(Math.random()*(to-from))+from
+let random = arr => arr[randInt(0, arr.length)]
 
-function randomConsoleColor() {
-    let colors = [
-        "\x1b[31m",
-        "\x1b[32m",
-        "\x1b[33m",
-        "\x1b[34m",
-        "\x1b[35m",
-        "\x1b[36m"
-    ]
-    return colors[Math.floor(Math.random()*colors.length)]
-}
+let randomPassiveAggression = () => random([":)", "🙃", ":]", "C:", ":3"])
+
+let randomConsoleColor = () => `\x1b[3${randInt(1,7)}m`
+
+let transIndicators = ["she","her","hers","he","him","his","they","their","theirs","it","its",
+"trans","transgender","pronouns","pronoun","nonbinary","gender","🏳️‍⚧️",]
 
 function maybePronounsInBio(bio) {
     if (bio==null||bio==undefined) return false
     let words = bio.replace(/[\.,\-|\n\:\/]/gm, ' ').split(' ')
-    if (
-        words.includes('she')||
-        words.includes('her')||
-        words.includes('hers')||
-        words.includes('he')||
-        words.includes('him')||
-        words.includes('his')||
-        words.includes('they')||
-        words.includes('their')||
-        words.includes('theirs')||
-        words.includes('it')||
-        words.includes('its')||
-        words.includes('trans')||
-        words.includes('transgender')||
-        words.includes('pronouns')||
-        words.includes('pronoun')||
-        words.includes('nonbinary')||
-        words.includes('gender')||
-        words.includes('🏳️‍⚧️')
-    ) return true
-    return false
+    return transIndicators.some(word => words.includes(word))
 }
+
+let sensitiveList = ['dying','dead','die','suicide','suicidal','rape','murder','kill','assassinat','war','bomb','threat','holocaust','slavery','racist','racism']
 
 function isSensitive(event, text) {
     if (event.possibly_sensitive) return true
-    if (
-        text.includes('dying')||
-        (text.includes('end')&&(text.includes('life')||text.includes('liv')))||
-        text.includes('dead')||
-        text.includes('die')||
-        text.includes('suicide')||
-        text.includes('suicidal')||
-        text.includes('rape')||
-        text.includes('murder')||
-        text.includes('kill')||
-        text.includes('assassinat')||
-        text.includes('war')||
-        text.includes('bomb')||
-        text.includes('threat')
-    ) return true
-    return false
+    if (text.includes('end')&&(text.includes('life')||text.includes('liv'))) return
+    return sensitiveList.some(word => text.includes(word))
 }
 
 stream.on('data', async (event) => {
-    if (Date.now()-lastTweet<minDelay) return
-    if (event.retweeted_status) return
     let bio = event.user.description
-    if (maybePronounsInBio(bio)) return
-    if (maybePronounsInBio(event.user.name)) return
     let tweetText = event.truncated?event.extended_tweet.full_text:event.text
-    if (isSensitive(event, tweetText)) return
-    if (tweetText.includes('pronoun')) return
-    if (tweetText.includes('they')) return
-    if (tweetText.includes('their')) return
-    let pronounType = null
-    if (tweetText.includes('he/she')||tweetText.includes('she/he')) {
-        pronounType = 'they'
-    } else if (tweetText.includes('his/her')||tweetText.includes('her/his')) {
-        pronounType = 'their'
-    } else if (tweetText.includes('him/her')||tweetText.includes('her/him')) {
-        pronounType = 'them'
-    } else {
-        return
+
+    if ([
+        Date.now()-lastTweet<minDelay,
+        event.retweeted_status,
+        maybePronounsInBio(bio),
+        maybePronounsInBio(event.user.name),
+        isSensitive(event, tweetText)
+        ['pronoun', 'they', 'their'].some(e=>tweetText.includes(e))
+    ].some(Boolean)) return
+    let pronounSets = ['he,she,they', 'his,her,their', 'him,her,them'].map(e=>e.split(','))
+    let seperators = [' / ', '/', ' or ']
+    let pronounType = false
+    for (let sep of seperators) {
+        for (let pron of pronounSets) {
+            if (tweetText.includes(pron[0]+sep+pron[1]) || tweetText.includes(pron[1]+sep+pron[0])) pronounType = pron[2]
+        }
     }
+    if (!pronounType) return
     lastTweet = Date.now()
     let tweetObj = {
         id: event.id_str,

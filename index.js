@@ -43,7 +43,7 @@ stream.on('data', async (event) => {
         event.retweeted_status,
         maybePronounsInBio(bio),
         maybePronounsInBio(event.user.name),
-        isSensitive(event, tweetText)
+        isSensitive(event, tweetText),
         ['pronoun', 'they', 'their'].some(e=>tweetText.includes(e))
     ].some(Boolean)) return
     let pronounSets = ['he,she,they', 'his,her,their', 'him,her,them'].map(e=>e.split(','))

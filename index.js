@@ -13,7 +13,7 @@ let lastTweet = Date.now()-minDelay
 let randInt = (from, to) => Math.floor(Math.random()*(to-from))+from
 let random = arr => arr[randInt(0, arr.length)]
 
-let randomPassiveAggression = () => random([":)", "🙃", ":]"])
+let randomPassiveAggression = () => random([":)", "🙃", ":]", "C:", ":3"])
 
 let randomConsoleColor = () => `\x1b[3${randInt(1,7)}m`
 
@@ -26,7 +26,7 @@ function maybePronounsInBio(bio) {
     return transIndicators.some(word => words.includes(word))
 }
 
-let sensitiveList = ['dying','dead','die','suicide','suicidal','rape','murder','kill','assassinat','war','bomb','threat']
+let sensitiveList = ['dying','dead','die','suicide','suicidal','rape','murder','kill','assassinat','war','bomb','threat','holocaust','slavery','racist','racism']
 
 function isSensitive(event, text) {
     if (event.possibly_sensitive) return true

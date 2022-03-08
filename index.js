@@ -26,7 +26,7 @@ function maybePronounsInBio(bio) {
     return transIndicators.some(word => words.includes(word))
 }
 
-let sensitiveList = ['dying','dead','die','suicide','suicidal','rape','murder','kill','assassinat','war','bomb','threat','holocaust','slavery','racist','racism']
+let sensitiveList = ['dying','dead','die','suicide','suicidal','rape','murder','kill','assassinat','war','bomb','threat','holocaust','slavery','racist','racism','looking for moots','pinned']
 
 function isSensitive(event, text) {
     if (event.possibly_sensitive) return true

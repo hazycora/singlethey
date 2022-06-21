@@ -76,5 +76,5 @@ stream.on('data', async (event) => {
 let lastCatched = Date.now()
 
 stream.on('error', function(error) {
-    throw error
+    console.log(error);
 })
